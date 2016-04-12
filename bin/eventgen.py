@@ -49,7 +49,7 @@ def parse_args():
     group.add_argument("-b", "--backfill",
                         help="Set time to backfill from.  Note: to use it, send the parameter with space in front like ' -60m'")
     group.add_argument("-e", "--end",
-                        help="Set time to end generation at.  Note: to use it, send the parameter with space in front like ' -10m'")
+                        help="Set time to end generation at or a number of intervals to run.  Note: to use it with a time, send the parameter with space in front like ' -10m'")
 
     group = parser.add_argument_group("Advanced", "Advanced settings for performance testing")
     group.add_argument("--generators", type=int, help="Number of GeneratorWorkers (mappers)")
@@ -76,21 +76,6 @@ if __name__ == '__main__':
     adapter = EventgenAdapter(logobj, {'sample': 'null', 'module': 'main'})
     logger = adapter
     logger.info('Starting eventgen')
-
-    # 5/6/12 CS use select to listen for input on stdin
-    # if we timeout, assume we're not splunk embedded
-    # Only support standalone mode on Unix due to limitation with select()
-    if os.name != "nt":
-        rlist, _, _ = select([sys.stdin], [], [], 1)
-        if rlist:
-            sessionKey = sys.stdin.readline().strip()
-        else:
-            sessionKey = ''
-    else:
-        sessionKey = sys.stdin.readline().strip()
-
-    if len(sessionKey) > 0:
-        c.makeSplunkEmbedded(sessionKey=sessionKey)
 
     c.parse()
 
